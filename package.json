@@ -1,0 +1,43 @@
+{
+    "name": "oc-ts",
+    "displayName": "OpenComputersTS",
+    "description": "Tools for writing OC programs with TypeScript",
+    "version": "0.0.1",
+    "publisher": "exeteres",
+    "private": true,
+    "engines": {
+        "vscode": "^1.41.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:oc-ts.init",
+        "onCommand:oc-ts.mount"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "oc-ts.init",
+                "title": "OC-TS: Init"
+            },
+            {
+                "command": "oc-ts.mount",
+                "title": "OC-TS: Mount"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "yarn run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+    "devDependencies": {
+        "@types/node": "^12.11.7",
+        "@types/vscode": "^1.41.0",
+        "glob": "^7.1.5",
+        "tslint": "^5.20.0",
+        "typescript": "^3.6.4"
+    }
+}

@@ -2,7 +2,7 @@
     "name": "oc-ts",
     "displayName": "OpenComputersTS",
     "description": "Tools for writing OC programs with TypeScript",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "exeteres",
     "private": true,
     "repository": "https://github.com/Exeteres/oc-ts-extension",
@@ -27,7 +27,20 @@
                 "command": "oc-ts.mount",
                 "title": "OC-TS: Mount"
             }
-        ]
+        ],
+        "configuration": {
+            "title": "OC-TS",
+            "properties": {
+                "oc-ts.paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "Paths to save or emulator"
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "yarn run compile",

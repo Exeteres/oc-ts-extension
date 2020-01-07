@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { resolve, join, dirname } from "path";
+import { resolve, join, isAbsolute } from "path";
 import { NavigationDirectory } from "./navigation/navigationDirectory";
 import {
     existsSync,
@@ -12,7 +12,7 @@ import {
 } from "fs";
 import { WorldNavigationDirectory } from "./navigation/worldNavigationDirectory";
 import { homedir, platform } from "os";
-import { NavigationRoot } from "./navigation/virtualNavigationDirectory";
+import { NavigationRoot } from "./navigation/navigationRoot";
 
 type Handler = (...args: any[]) => any;
 
@@ -33,10 +33,15 @@ export function init(context: vscode.ExtensionContext): Handler {
     };
 }
 
-function findDirectory(paths: string[]): string | undefined {
-    let home = homedir();
-    let path = paths.find(x => existsSync(resolve(home, x)));
-    return path ? resolve(home, path) : undefined;
+let home = homedir();
+
+function normalizePath(path: string): string {
+    return isAbsolute(path) ? path : resolve(home, path);
+}
+
+function findDirectory(path: string): string | undefined {
+    let normalized = normalizePath(path);
+    return existsSync(normalized) ? normalized : undefined;
 }
 
 export function mount(context: vscode.ExtensionContext): Handler {
@@ -44,10 +49,18 @@ export function mount(context: vscode.ExtensionContext): Handler {
         let items: NavigationDirectory[] = [];
         let navigationRoot = new NavigationRoot();
 
-        let savesPath = findDirectory(["AppData\\Roaming\\.minecraft\\saves"]);
-        if (savesPath) {
-            for (let save of readdirSync(savesPath)) {
-                let path = join(savesPath, save);
+        let config = vscode.workspace.getConfiguration();
+        let paths = config.get<string[]>("oc-ts.paths") ?? [];
+        paths.push("AppData\\Roaming\\.minecraft\\saves");
+
+        let normalizedPaths = [...new Set(paths.map(normalizePath))];
+        for (let dir of normalizedPaths) {
+            if (!existsSync(dir)) {
+                continue;
+            }
+
+            for (let save of readdirSync(dir)) {
+                let path = join(dir, save);
                 let stats = statSync(path);
                 if (!stats.isDirectory()) {
                     continue;
@@ -69,7 +82,7 @@ export function mount(context: vscode.ExtensionContext): Handler {
             }
         }
 
-        let ocemu = findDirectory(["AppData\\Roaming\\OCEmu"]);
+        let ocemu = findDirectory("AppData\\Roaming\\OCEmu");
         if (ocemu) {
             let name = `[emulator] OCEmu`;
             let directory = new WorldNavigationDirectory(

@@ -1,7 +1,7 @@
 import { NavigationDirectory } from "./navigationDirectory";
 import { readdirSync } from "fs";
 import { join } from "path";
-import { NavigationRoot } from "./virtualNavigationDirectory";
+import { NavigationRoot } from "./navigationRoot";
 
 function isUUID(str: string): boolean {
     let regex = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/;

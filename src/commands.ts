@@ -50,12 +50,12 @@ export function mount(context: vscode.ExtensionContext): Handler {
                 let path = join(savesPath, save);
                 let stats = statSync(path);
                 if (!stats.isDirectory()) {
-                    return;
+                    continue;
                 }
 
                 let ocDirectory = join(path, "opencomputers");
                 if (!existsSync(ocDirectory)) {
-                    return;
+                    continue;
                 }
 
                 let name = `[save] ${save}`;
@@ -81,7 +81,7 @@ export function mount(context: vscode.ExtensionContext): Handler {
             items.push(directory);
         }
 
-        if (!items) {
+        if (items.length === 0) {
             vscode.window.showWarningMessage("No save or emulator was found");
             return;
         }

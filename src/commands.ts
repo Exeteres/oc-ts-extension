@@ -5,7 +5,6 @@ import {
     existsSync,
     readdirSync,
     statSync,
-    stat,
     symlinkSync,
     unlinkSync,
     rmdirSync
@@ -14,15 +13,16 @@ import { WorldNavigationDirectory } from "./navigation/worldNavigationDirectory"
 import { homedir, platform } from "os";
 import { NavigationRoot } from "./navigation/navigationRoot";
 
-type Handler = (...args: any[]) => any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CommandHandler = (...args: any[]) => any;
 
-export function init(context: vscode.ExtensionContext): Handler {
+export function init(context: vscode.ExtensionContext): CommandHandler {
     return () => {
         // Resolve scripts path
-        let ext = platform() === "win32" ? "bat" : "sh";
-        let path = resolve(__dirname, "..", "scripts", `init.${ext}`);
+        const ext = platform() === "win32" ? "bat" : "sh";
+        const path = resolve(__dirname, "..", "scripts", `init.${ext}`);
 
-        let terminal = vscode.window.createTerminal({
+        const terminal = vscode.window.createTerminal({
             name: "OC-TS Init",
             shellPath: path
         });
@@ -33,46 +33,46 @@ export function init(context: vscode.ExtensionContext): Handler {
     };
 }
 
-let home = homedir();
+const home = homedir();
 
 function normalizePath(path: string): string {
     return isAbsolute(path) ? path : resolve(home, path);
 }
 
 function findDirectory(path: string): string | undefined {
-    let normalized = normalizePath(path);
+    const normalized = normalizePath(path);
     return existsSync(normalized) ? normalized : undefined;
 }
 
-export function mount(context: vscode.ExtensionContext): Handler {
+export function mount(): CommandHandler {
     return () => {
-        let items: NavigationDirectory[] = [];
-        let navigationRoot = new NavigationRoot();
+        const items: NavigationDirectory[] = [];
+        const navigationRoot = new NavigationRoot();
 
-        let config = vscode.workspace.getConfiguration();
-        let paths = config.get<string[]>("oc-ts.paths") ?? [];
+        const config = vscode.workspace.getConfiguration();
+        const paths = config.get<string[]>("oc-ts.paths") ?? [];
         paths.push("AppData\\Roaming\\.minecraft\\saves");
 
-        let normalizedPaths = [...new Set(paths.map(normalizePath))];
-        for (let dir of normalizedPaths) {
+        const normalizedPaths = [...new Set(paths.map(normalizePath))];
+        for (const dir of normalizedPaths) {
             if (!existsSync(dir)) {
                 continue;
             }
 
-            for (let save of readdirSync(dir)) {
-                let path = join(dir, save);
-                let stats = statSync(path);
+            for (const save of readdirSync(dir)) {
+                const path = join(dir, save);
+                const stats = statSync(path);
                 if (!stats.isDirectory()) {
                     continue;
                 }
 
-                let ocDirectory = join(path, "opencomputers");
+                const ocDirectory = join(path, "opencomputers");
                 if (!existsSync(ocDirectory)) {
                     continue;
                 }
 
-                let name = `[save] ${save}`;
-                let directory = new WorldNavigationDirectory(
+                const name = `[save] ${save}`;
+                const directory = new WorldNavigationDirectory(
                     ocDirectory,
                     save,
                     navigationRoot,
@@ -82,10 +82,10 @@ export function mount(context: vscode.ExtensionContext): Handler {
             }
         }
 
-        let ocemu = findDirectory("AppData\\Roaming\\OCEmu");
+        const ocemu = findDirectory("AppData\\Roaming\\OCEmu");
         if (ocemu) {
-            let name = `[emulator] OCEmu`;
-            let directory = new WorldNavigationDirectory(
+            const name = `[emulator] OCEmu`;
+            const directory = new WorldNavigationDirectory(
                 ocemu,
                 "OCEmu",
                 navigationRoot,
@@ -100,18 +100,18 @@ export function mount(context: vscode.ExtensionContext): Handler {
         }
 
         navigationRoot.showItems(path => {
-            let workspaces = vscode.workspace.workspaceFolders;
+            const workspaces = vscode.workspace.workspaceFolders;
             if (!workspaces) {
                 vscode.window.showErrorMessage("No active workspace was found");
                 return;
             }
 
-            let root = workspaces[0].uri.fsPath;
-            let distPath = join(root, "dist");
+            const root = workspaces[0].uri.fsPath;
+            const distPath = join(root, "dist");
 
             // Remove link or directory if exists
             if (existsSync(distPath)) {
-                let stats = statSync(distPath);
+                const stats = statSync(distPath);
                 if (stats.isDirectory()) {
                     rmdirSync(distPath);
                 } else {

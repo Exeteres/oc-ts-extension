@@ -9,15 +9,15 @@ export class NavigationDirectory extends NavigationItem {
     readonly parent?: NavigationDirectory;
 
     protected loadItems(): NavigationDirectory[] {
-        let result: NavigationDirectory[] = [];
+        const result: NavigationDirectory[] = [];
 
-        let items = readdirSync(this.path);
-        for (let item of items) {
-            let path = join(this.path, item);
-            let stats = statSync(path);
+        const items = readdirSync(this.path);
+        for (const item of items) {
+            const path = join(this.path, item);
+            const stats = statSync(path);
             if (stats.isDirectory()) {
-                let virtualPath = join(this.virtualPath, item);
-                let directory = new NavigationDirectory(
+                const virtualPath = join(this.virtualPath, item);
+                const directory = new NavigationDirectory(
                     path,
                     virtualPath,
                     this,
@@ -30,16 +30,16 @@ export class NavigationDirectory extends NavigationItem {
         return result;
     }
 
-    async showItems(callback: OKHandler, level: number = 0): Promise<void> {
-        let items = this.loadItems();
-        let okText = `OK - ${this.virtualPath}`;
-        let values = [
+    async showItems(callback: OKHandler, level = 0): Promise<void> {
+        const items = this.loadItems();
+        const okText = `OK - ${this.virtualPath}`;
+        const values = [
             ...(level > 1 ? [okText] : []), // OK button
             ...(level > 0 ? [".."] : []), // Back button
             ...items.map(x => x.name!)
         ];
 
-        let result = await vscode.window.showQuickPick(values);
+        const result = await vscode.window.showQuickPick(values);
         if (!result) {
             return;
         }
@@ -54,7 +54,7 @@ export class NavigationDirectory extends NavigationItem {
             return;
         }
 
-        let item = items.find(x => x.name === result);
+        const item = items.find(x => x.name === result);
         if (item) {
             item.showItems(callback, ++level);
         }

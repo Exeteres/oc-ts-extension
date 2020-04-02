@@ -4,19 +4,19 @@ import { join } from "path";
 import { NavigationRoot } from "./navigationRoot";
 
 function isUUID(str: string): boolean {
-    let regex = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/;
+    const regex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
     return regex.test(str);
 }
 
 export class WorldNavigationDirectory extends NavigationDirectory {
     protected loadItems(): NavigationDirectory[] {
-        let result: NavigationDirectory[] = [];
+        const result: NavigationDirectory[] = [];
 
-        for (let disk of readdirSync(this.path)) {
+        for (const disk of readdirSync(this.path)) {
             if (isUUID(disk)) {
-                let path = join(this.path, disk);
-                let virtualPath = join(this.virtualPath, disk);
-                let directory = new NavigationDirectory(
+                const path = join(this.path, disk);
+                const virtualPath = join(this.virtualPath, disk);
+                const directory = new NavigationDirectory(
                     path,
                     virtualPath,
                     this,

@@ -4,7 +4,7 @@ import * as thread from "thread";
 import * as event from "event";
 import * as filesystem from "filesystem";
 
-const version = "0.1.3";
+const version = "0.2.0";
 
 // Networking
 const host = "localhost";

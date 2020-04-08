@@ -2,7 +2,7 @@
     "name": "oc-ts",
     "displayName": "OpenComputersTS",
     "description": "Tools for writing OC programs with TypeScript",
-    "version": "0.1.3",
+    "version": "0.2.0",
     "publisher": "exeteres",
     "private": true,
     "repository": "https://github.com/Exeteres/oc-ts-extension",
@@ -148,6 +148,7 @@
     },
     "dependencies": {
         "fs-extra": "^9.0.0",
+        "source-map": "^0.7.3",
         "vscode-debugadapter": "^1.40.0"
     }
 }

@@ -2,7 +2,14 @@
 
 All notable changes to the **OpenComputersTS** extension will be documented in this file.
 
-## 0.1.0 - 2020-04-08
+## 0.2.0 - 2020-04-08
+
+## Fixed
+
+- Invalid versioning.
+- Missed npm dependency.
+
+## 0.1.3 - 2020-04-08 [YANKED]
 
 ### Added
 

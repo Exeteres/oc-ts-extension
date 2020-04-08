@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "lib": ["esnext"],
+        "moduleResolution": "node",
+        "outDir": "../../../out/debugger/client",
+        "types": ["lua-types/5.2", "@opct/openos"]
+    },
+    "tstl": {
+        "luaTarget": "5.2",
+        "noImplicitSelf": true,
+        "luaLibImport": "inline"
+    },
+    "include": [".", "../*.d.ts"],
+    "exclude": []
+}

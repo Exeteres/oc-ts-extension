@@ -1,28 +1,32 @@
-import * as vscode from "vscode";
 import { resolve, join, isAbsolute } from "path";
-import { NavigationDirectory } from "./navigation/navigationDirectory";
+import { OKHandler } from "./navigation/navigationDirectory";
 import {
     existsSync,
     readdirSync,
     statSync,
     symlinkSync,
     unlinkSync,
-    rmdirSync
+    rmdirSync,
+    copyFileSync
 } from "fs";
-import { WorldNavigationDirectory } from "./navigation/worldNavigationDirectory";
+import {
+    WorldNavigationDirectory,
+    WorldNavigationOptions
+} from "./navigation/worldNavigationDirectory";
 import { homedir, platform } from "os";
 import { NavigationRoot } from "./navigation/navigationRoot";
+import { ExtensionContext, window, workspace } from "vscode";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CommandHandler = (...args: any[]) => any;
 
-export function init(context: vscode.ExtensionContext): CommandHandler {
+export function init(context: ExtensionContext): CommandHandler {
     return () => {
         // Resolve scripts path
         const ext = platform() === "win32" ? "bat" : "sh";
         const path = resolve(__dirname, "..", "scripts", `init.${ext}`);
 
-        const terminal = vscode.window.createTerminal({
+        const terminal = window.createTerminal({
             name: "OC-TS Init",
             shellPath: path
         });
@@ -44,65 +48,63 @@ function findDirectory(path: string): string | undefined {
     return existsSync(normalized) ? normalized : undefined;
 }
 
-export function mount(): CommandHandler {
-    return () => {
-        const items: NavigationDirectory[] = [];
-        const navigationRoot = new NavigationRoot();
+function showItems(options: WorldNavigationOptions, callback: OKHandler): void {
+    const navigationRoot = new NavigationRoot();
 
-        const config = vscode.workspace.getConfiguration();
-        const paths = config.get<string[]>("oc-ts.paths") ?? [];
-        paths.push("AppData\\Roaming\\.minecraft\\saves");
+    const config = workspace.getConfiguration();
+    const paths = config.get<string[]>("oc-ts.paths") ?? [];
+    paths.push("AppData\\Roaming\\.minecraft\\saves");
 
-        const normalizedPaths = [...new Set(paths.map(normalizePath))];
-        for (const dir of normalizedPaths) {
-            if (!existsSync(dir)) {
+    const normalizedPaths = [...new Set(paths.map(normalizePath))];
+    for (const dir of normalizedPaths) {
+        if (!existsSync(dir)) {
+            continue;
+        }
+
+        for (const save of readdirSync(dir)) {
+            const path = join(dir, save);
+            const stats = statSync(path);
+            if (!stats.isDirectory()) {
                 continue;
             }
 
-            for (const save of readdirSync(dir)) {
-                const path = join(dir, save);
-                const stats = statSync(path);
-                if (!stats.isDirectory()) {
-                    continue;
-                }
-
-                const ocDirectory = join(path, "opencomputers");
-                if (!existsSync(ocDirectory)) {
-                    continue;
-                }
-
-                const name = `[save] ${save}`;
-                const directory = new WorldNavigationDirectory(
-                    ocDirectory,
-                    save,
-                    navigationRoot,
-                    name
-                );
-                items.push(directory);
+            const ocDirectory = join(path, "opencomputers");
+            if (!existsSync(ocDirectory)) {
+                continue;
             }
-        }
 
-        const ocemu = findDirectory("AppData\\Roaming\\OCEmu");
-        if (ocemu) {
-            const name = `[emulator] OCEmu`;
+            const name = `[save] ${save}`;
             const directory = new WorldNavigationDirectory(
-                ocemu,
-                "OCEmu",
-                navigationRoot,
-                name
+                ocDirectory,
+                save,
+                name,
+                options
             );
-            items.push(directory);
+            navigationRoot.addDirectory(directory);
         }
+    }
 
-        if (items.length === 0) {
-            vscode.window.showWarningMessage("No save or emulator was found");
-            return;
-        }
+    const ocemu = findDirectory("AppData\\Roaming\\OCEmu");
+    if (ocemu) {
+        const name = `[emulator] OCEmu`;
+        const directory = new WorldNavigationDirectory(ocemu, "OCEmu", name, options);
+        navigationRoot.addDirectory(directory);
+    }
 
-        navigationRoot.showItems(path => {
-            const workspaces = vscode.workspace.workspaceFolders;
+    if (navigationRoot.empty) {
+        window.showWarningMessage("No save or emulator was found.");
+        return;
+    }
+
+    navigationRoot.showItems(callback);
+}
+
+export function mount(): CommandHandler {
+    return () => {
+        showItems({}, path => {
+            const workspaces = workspace.workspaceFolders;
             if (!workspaces) {
-                vscode.window.showErrorMessage("No active workspace was found");
+                window.showErrorMessage("No active workspace was found.");
                 return;
             }
 
@@ -121,7 +123,26 @@ export function mount(): CommandHandler {
 
             // Create symlink
             symlinkSync(path, distPath, "junction");
-            vscode.window.showInformationMessage("Link created successfully");
+            window.showInformationMessage("Link created successfully.");
+        });
+    };
+}
+
+export function installClient(): CommandHandler {
+    return () => {
+        showItems({ installClient: true }, path => {
+            const clientPath = resolve(__dirname, "debugger/client/tsdbg.lua");
+            const clientTargetPath = resolve(path, "bin/tsdbg.lua");
+            copyFileSync(clientPath, clientTargetPath);
+
+            const jsonPath = resolve(__dirname, "../static/json.lua");
+            const jsonTargetPath = resolve(path, "lib/json.lua");
+
+            if (!existsSync(jsonTargetPath)) {
+                copyFileSync(jsonPath, jsonTargetPath);
+            }
+
+            window.showInformationMessage('Client installed successfully. Run "tsdbg".');
         });
     };
 }

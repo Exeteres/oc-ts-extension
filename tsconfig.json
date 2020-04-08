@@ -6,7 +6,9 @@
         "lib": ["es6"],
         "sourceMap": true,
         "rootDir": "src",
-        "strict": true
+        "esModuleInterop": true,
+        "strict": true,
+        "types": ["@types/node"]
     },
-    "exclude": ["node_modules"]
+    "include": ["src"]
 }

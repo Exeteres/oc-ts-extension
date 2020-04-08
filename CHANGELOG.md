@@ -2,6 +2,18 @@
 
 All notable changes to the **OpenComputersTS** extension will be documented in this file.
 
+## 0.1.0 - 2020-04-08
+
+### Added
+
+- `tsdbg` - Simple debugger for OpenOS.
+- `OC-TS: Install client` - Command for installing client to OC disk.
+- OS Detection in `OC-TS: Mount` and `OC-TS: Install client` commands.
+
+### Changed
+
+- `OC-TS: Init` command now adds `.vscode` folder with debugger configuration.
+
 ## 0.0.3
 
 ### Added

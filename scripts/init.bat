@@ -44,6 +44,14 @@ echo Creating main.ts
 copy %scriptDir%assets\main.ts- src\main.ts || call :error "Error while creating main.ts"
 echo.
 
+echo Creating .vscode directory
+call :run "mkdir .vscode" || call :error "Error while creating .vscode directory"
+echo.
+
+echo Creating launch.json
+copy %scriptDir%assets\launch.json .vscode\launch.json || call :error "Error while creating launch.json"
+echo.
+
 echo Installing dependencies
 (
     call npm install typescript-to-lua ^@opct/openos -D

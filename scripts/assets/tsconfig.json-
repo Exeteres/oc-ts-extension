@@ -5,6 +5,7 @@
         "module": "commonjs",
         "lib": ["esnext"],
         "strict": true,
+        "sourceMap": true,
         "moduleResolution": "node",
         "rootDir": "src",
         "types": ["lua-types/jit", "@opct/openos"]

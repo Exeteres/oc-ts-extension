@@ -3,15 +3,20 @@ import { NavigationDirectory } from "./navigationDirectory";
 export class NavigationRoot extends NavigationDirectory {
     private readonly _items: NavigationDirectory[] = [];
 
-    loadItems(): NavigationDirectory[] {
+    protected loadItems(): NavigationDirectory[] {
         return this._items;
     }
 
-    addDirectory(directory: NavigationDirectory): void {
+    public addDirectory(directory: NavigationDirectory): void {
         this._items.push(directory);
+        directory.setParent(this);
     }
 
-    constructor() {
+    public get empty(): boolean {
+        return this._items.length === 0;
+    }
+
+    public constructor() {
         super("", "");
     }
 }

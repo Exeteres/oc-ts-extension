@@ -5,5 +5,18 @@
     "search.exclude": {
         "out": true
     },
-    "typescript.tsc.autoDetect": "off"
+    "typescript.tsc.autoDetect": "off",
+    "prettier.printWidth": 90,
+    "vsicons.associations.files": [
+        {
+            "icon": "tsconfig",
+            "extensions": ["tsconfig.build.json"],
+            "filename": true
+        }
+    ],
+    "prettier.arrowParens": "avoid",
+    "prettier.trailingComma": "none",
+    "markdownlint.config": {
+        "MD024": false
+    }
 }

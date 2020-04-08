@@ -2,7 +2,7 @@
     "name": "oc-ts",
     "displayName": "OpenComputersTS",
     "description": "Tools for writing OC programs with TypeScript",
-    "version": "0.0.3",
+    "version": "0.1.3",
     "publisher": "exeteres",
     "private": true,
     "repository": "https://github.com/Exeteres/oc-ts-extension",
@@ -13,8 +13,12 @@
         "Other"
     ],
     "activationEvents": [
+        "onDebugResolve:tsdbg",
+        "onLanguage:typescript",
+        "onLanguage:lua",
         "onCommand:oc-ts.init",
-        "onCommand:oc-ts.mount"
+        "onCommand:oc-ts.mount",
+        "onCommand:oc-ts.installClient"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -26,6 +30,10 @@
             {
                 "command": "oc-ts.mount",
                 "title": "OC-TS: Mount"
+            },
+            {
+                "command": "oc-ts.installClient",
+                "title": "OC-TS: Install client"
             }
         ],
         "configuration": {
@@ -40,19 +48,106 @@
                     "description": "Paths to save or emulator"
                 }
             }
-        }
+        },
+        "debuggers": [
+            {
+                "type": "tsdbg",
+                "label": "OC-TS Debugger",
+                "program": "./debugger/server/debugAdapter.js",
+                "languages": [
+                    "lua",
+                    "typescript"
+                ],
+                "initialConfigurations": [
+                    {
+                        "name": "Debug in OpenOS",
+                        "type": "tsdbg",
+                        "request": "launch",
+                        "outRoot": {
+                            "local": "${workspaceFolder}/dist",
+                            "remote": "/home/dist"
+                        },
+                        "program": "${file}"
+                    }
+                ],
+                "configurationAttributes": {
+                    "launch": {
+                        "properties": {
+                            "cwd": {
+                                "type": "string",
+                                "description": "Working directory",
+                                "default": "/home"
+                            },
+                            "env": {
+                                "type": "object",
+                                "description": "Environment variables",
+                                "default": {}
+                            },
+                            "args": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "Program arguments",
+                                "default": []
+                            },
+                            "program": {
+                                "type": "string"
+                            },
+                            "outRoot": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                    "local": {
+                                        "type": "string"
+                                    },
+                                    "remote": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "local",
+                                    "remote"
+                                ]
+                            },
+                            "sourceRoot": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "program",
+                            "outRoot"
+                        ]
+                    }
+                }
+            }
+        ]
     },
     "scripts": {
-        "vscode:prepublish": "yarn run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./"
+        "vscode:prepublish": "yarn lint --max-warnings=0 && yarn compile",
+        "lint": "eslint src/**/*.ts",
+        "postinstall": "yarn download:jsonlib",
+        "download:jsonlib": "download -o static https://raw.githubusercontent.com/rxi/json.lua/master/json.lua",
+        "compile": "yarn compile:extension && yarn compile:client",
+        "compile:extension": "tsc -p ./tsconfig.build.json",
+        "compile:client": "tstl -p ./src/debugger/client",
+        "watch": "tsc -watch -p ./tsconfig.build.json"
     },
     "devDependencies": {
+        "@opct/openos": "^0.0.15",
+        "@types/fs-extra": "^8.1.0",
         "@types/node": "^13.9.8",
         "@types/vscode": "^1.41.0",
         "@typescript-eslint/eslint-plugin": "^2.26.0",
         "@typescript-eslint/parser": "^2.26.0",
+        "download-cli": "^1.1.1",
         "eslint": "^6.8.0",
-        "typescript": "^3.6.4"
+        "typescript": "^3.6.4",
+        "typescript-to-lua": "^0.32.0",
+        "vscode-debugprotocol": "^1.40.0"
+    },
+    "dependencies": {
+        "fs-extra": "^9.0.0",
+        "vscode-debugadapter": "^1.40.0"
     }
 }

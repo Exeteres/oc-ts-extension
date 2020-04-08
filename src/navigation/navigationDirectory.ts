@@ -1,12 +1,12 @@
 import { NavigationItem } from "./navigationItem";
 import { readdirSync, statSync } from "fs";
 import { join } from "path";
-import * as vscode from "vscode";
+import { window } from "vscode";
 
-type OKHandler = (path: string) => void;
+export type OKHandler = (path: string) => void;
 
 export class NavigationDirectory extends NavigationItem {
-    readonly parent?: NavigationDirectory;
+    private _parent?: NavigationDirectory;
 
     protected loadItems(): NavigationDirectory[] {
         const result: NavigationDirectory[] = [];
@@ -17,12 +17,8 @@ export class NavigationDirectory extends NavigationItem {
             const stats = statSync(path);
             if (stats.isDirectory()) {
                 const virtualPath = join(this.virtualPath, item);
-                const directory = new NavigationDirectory(
-                    path,
-                    virtualPath,
-                    this,
-                    item
-                );
+                const directory = new NavigationDirectory(path, virtualPath, item);
+                directory._parent = this;
                 result.push(directory);
             }
         }
@@ -30,7 +26,7 @@ export class NavigationDirectory extends NavigationItem {
         return result;
     }
 
-    async showItems(callback: OKHandler, level = 0): Promise<void> {
+    public async showItems(callback: OKHandler, level = 0): Promise<void> {
         const items = this.loadItems();
         const okText = `OK - ${this.virtualPath}`;
         const values = [
@@ -39,7 +35,7 @@ export class NavigationDirectory extends NavigationItem {
             ...items.map(x => x.name!)
         ];
 
-        const result = await vscode.window.showQuickPick(values);
+        const result = await window.showQuickPick(values);
         if (!result) {
             return;
         }
@@ -50,7 +46,7 @@ export class NavigationDirectory extends NavigationItem {
         }
 
         if (result === "..") {
-            this.parent?.showItems(callback, --level);
+            this._parent?.showItems(callback, --level);
             return;
         }
 
@@ -60,13 +56,11 @@ export class NavigationDirectory extends NavigationItem {
         }
     }
 
-    constructor(
-        path: string,
-        virtualPath: string,
-        parent?: NavigationDirectory,
-        name?: string
-    ) {
+    public setParent(parent: NavigationDirectory): void {
+        this._parent = parent;
+    }
+
+    public constructor(path: string, virtualPath: string, name?: string) {
         super(path, virtualPath, name);
-        this.parent = parent;
     }
 }

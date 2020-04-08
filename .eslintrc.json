@@ -12,10 +12,25 @@
     },
     "plugins": ["@typescript-eslint"],
     "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-namespace": "off",
+        "curly": "warn",
         "@typescript-eslint/explicit-function-return-type": [
             "warn",
             { "allowExpressions": true }
         ],
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/explicit-member-accessibility": "error",
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "property",
+                "modifiers": ["private"],
+                "format": ["camelCase"],
+                "leadingUnderscore": "require"
+            }
+        ],
+        "eqeqeq": "warn"
     }
 }

@@ -2,9 +2,15 @@
 
 All notable changes to the **OpenComputersTS** extension will be documented in this file.
 
+## 0.2.1 - 2021-05-10
+
+### Fixed
+
+- Update tsconfig to use tstl language exstensions
+
 ## 0.2.0 - 2020-04-08
 
-## Fixed
+### Fixed
 
 - Invalid versioning.
 - Missed npm dependency.

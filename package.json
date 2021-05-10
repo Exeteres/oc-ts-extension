@@ -2,7 +2,7 @@
     "name": "oc-ts",
     "displayName": "OpenComputersTS",
     "description": "Tools for writing OC programs with TypeScript",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "publisher": "exeteres",
     "private": true,
     "repository": "https://github.com/Exeteres/oc-ts-extension",

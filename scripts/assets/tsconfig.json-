@@ -8,7 +8,7 @@
         "sourceMap": true,
         "moduleResolution": "node",
         "rootDir": "src",
-        "types": ["typescript-to-lua/language-extensions", "lua-types/jit"]
+        "types": ["@typescript-to-lua/language-extensions", "lua-types/jit"]
     },
     "tstl": {
         "luaTarget": "JIT"

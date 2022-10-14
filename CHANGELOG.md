@@ -2,6 +2,12 @@
 
 All notable changes to the **OpenComputersTS** extension will be documented in this file.
 
+## 0.2.2 - 2022-10-14
+
+### Fixed
+
+- `OC-TS: Init` command now generates a `tsconfig.json` file with the correct `types` property.
+
 ## 0.2.1 - 2021-05-10
 
 ### Fixed
